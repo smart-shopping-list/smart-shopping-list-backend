@@ -1,1 +1,1 @@
-# smart-shopping-list-backend
+# Бэкенд (Laravel API)
