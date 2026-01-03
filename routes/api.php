@@ -13,12 +13,3 @@ Route::middleware("auth:sanctum")->group(function () {
         return $request->user();
     });
 });
-
-// Route::get('/user', function (Request $request) {
-//     return $request->user();
-// })->middleware('auth:sanctum');
-
-// Route::controller(AuthController::class)->group(function () {
-//     Route::post("signup", "signup");
-//     // Route::post("login", [AuthController::class, "login"]);
-// });
