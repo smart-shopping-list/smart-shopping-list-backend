@@ -2,35 +2,34 @@
 
 namespace App\Console\Commands;
 
-
-class MakeAdminModule extends BaseMakeModule
+class MakeApiModule extends BaseMakeModule
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'make:admin-module {name}';
+    protected $signature = 'make:api-module {name}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Создать полный модуль для админки';
+    protected $description = 'Создать полный модуль для Api';
 
     protected function getModulePath(string $modelName): string
     {
-        return "Admin/{$modelName}";
+        return "Api/{$modelName}";
     }
 
     protected function getControllerPath(): string
     {
-        return 'Admin';
+        return 'Api';
     }
 
     protected function getRequestPath(): string
     {
-        return 'Admin';
+        return 'Api';
     }
 }
