@@ -2,12 +2,14 @@
 
 namespace App\Models;
 
+use App\Traits\HasCachedMap;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Cache;
 
 
 /**
@@ -22,14 +24,14 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  */
 class Category extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, HasCachedMap;
+
     /**
      * Имя таблицы, связанной с моделью.
      * @var string
      */
     protected $table = 'categories';
 
-    private static $typeCache = null;
 
     protected $fillable = ['type_good_id', 'name', 'description',
         'icon', 'color', 'sort_order', 'is_active'];
@@ -39,6 +41,11 @@ class Category extends Model
         'sort_order' => 'integer',
         'deleted_at' => 'datetime',
     ];
+
+    protected static function booted(): void
+    {
+        static::bootHasCachedMap();
+    }
 
     /**
      * Отношение с продуктами
@@ -58,9 +65,8 @@ class Category extends Model
         return $this->belongsTo(TypeGoods::class, 'type_good_id');
     }
 
-
     /**
-     * получение имени типа продукта
+     * Получение имени типа продукта
      * @return string|null
      */
     public function getTypeGoodNameAttribute(): ?string
@@ -69,7 +75,7 @@ class Category extends Model
     }
 
     /**
-     * мутатор для color с валидацией
+     * Мутатор для color с валидацией
      * @param $value
      * @return void
      */
@@ -102,14 +108,13 @@ class Category extends Model
      */
     public function scopeOfTypeName(Builder $query, string $typeName): Builder
     {
-        if (self::$typeCache === null) {
-            self::$typeCache = TypeGoods::whereNull('deleted_at')
-                ->get()
-                ->keyBy('name');
+        $type = TypeGoods::findByName($typeName);
+
+        if (!$type) {
+            return $query->whereRaw('1 = 0');
         }
 
-        $typeId = self::$typeCache[$typeName]->id ?? null;
-        return $query->where('type_good_id', $typeId);
+        return $query->where('type_good_id', $type->id);
     }
 
     /**

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\HasCachedMap;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -16,7 +17,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  */
 class TypeGoods extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, HasCachedMap;
 
     /**
      * Имя таблицы, связанной с моделью.
@@ -35,6 +36,11 @@ class TypeGoods extends Model
         'name',
         'description'
     ];
+
+    protected static function booted(): void
+    {
+        static::bootHasCachedMap();
+    }
 
     /**
      * Отношение с категориями
