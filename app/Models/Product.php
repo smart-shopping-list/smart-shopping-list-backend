@@ -28,6 +28,11 @@ use Illuminate\Support\Facades\Cache;
  * @var float $package_amount количество товара
  * @var integer $package_unit_id id единицы измерения
  * @var string $package_size произвольное отображение размера (на случай особых форматов)
+ *
+ *   Дефолтные значения при отсутствии unit:
+ *   - name: 'шт.'
+ *   - short_name: 'шт.'
+ *   - conversion_rate: 1
  */
 class Product extends Model
 {
@@ -114,7 +119,11 @@ class Product extends Model
      */
     public function defaultUnit(): BelongsTo
     {
-        return $this->belongsTo(Unit::class, 'default_unit_id');
+        return $this->belongsTo(Unit::class, 'default_unit_id')->withDefault([
+            'name' => 'шт.',
+            'short_name' => 'шт.',
+            'conversion_rate' => 1,
+        ]);
     }
 
     /**
@@ -123,9 +132,12 @@ class Product extends Model
      */
     public function packageUnit(): BelongsTo
     {
-        return $this->belongsTo(Unit::class, 'package_unit_id');
+        return $this->belongsTo(Unit::class, 'package_unit_id')->withDefault([
+            'name' => 'шт.',
+            'short_name' => 'шт.',
+            'conversion_rate' => 1,
+        ]);
     }
-
 
     /**
      * Получение имени типа продукта
@@ -299,17 +311,5 @@ class Product extends Model
     public function scopeOrdered(Builder $query): Builder
     {
         return $query->orderBy('name');
-    }
-
-    /**
-     * Событие для управления кэшем
-     * @return void
-     */
-    protected static function booted(): void
-    {
-        static::saved(function ($product) {
-            // Сбросить кэш при сохранении
-            Cache::forget('products_active_count');
-        });
     }
 }
